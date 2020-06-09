@@ -127,28 +127,28 @@ int main()
 			printf("Received data: %s\n", sReceiveBuffer);
 
 			// Анализируем полученные команды или преобразуем текст в верхний регистр
-			if (strcmp(sReceiveBuffer, "info") == 0)
+			if (strcmp(sReceiveBuffer, "Info") == 0)
 			{
 				send_string(NS, "Test TCP-server.\nDeveloper: Hurrinecane\r\n");
 			}
-			else if (strcmp(sReceiveBuffer, "task") == 0)
+			else if (strcmp(sReceiveBuffer, "Task") == 0)
 			{
 				send_string(NS, "Task: \"Добавить в сервис поддержку дополнительной команды, для игры в города.\nКлиент отправляет на сервер некоторое символьное имя.\nСервер ищет в файле город, который начинается на букву, которой заканчивается город клиента.\nЕсли в файле информация не найдена, клиенту возвращается соответствующее сообщение.\"\r\n");
 			}
-			else if (strcmp(sReceiveBuffer, "exit") == 0)
+			else if (strcmp(sReceiveBuffer, "Exit") == 0)
 			{
 				send_string(NS, "Bye...\r\n");
 				printf("Client initialize disconnection.\r\n");
 				break;
 			}
-			else if (strcmp(sReceiveBuffer, "time") == 0)
+			else if (strcmp(sReceiveBuffer, "Time") == 0)
 			{
 				time_t now = time(0);
 				char* dt = ctime(&now);
 				send_string(NS, "The current date and time: ");
 				send_string(NS, dt);
 			}
-			else if (strcmp(sReceiveBuffer, "shutdown") == 0)
+			else if (strcmp(sReceiveBuffer, "Shutdown") == 0)
 			{
 				send_string(NS, "Server go to shutdown.\r\n");
 				Sleep(200);
@@ -178,7 +178,7 @@ int main()
 
 					file.close();
 
-					send_string(NS, "Начинается игра в города. Для остановки введите \"stop\"\nВведите название города:\n");
+					send_string(NS, "Начинается игра в города. Для остановки введите \"Stop\"\nВведите название города:\n");
 
 					do
 					{
@@ -192,15 +192,18 @@ int main()
 
 						printf("Received data: %s\n", sReceiveBuffer);
 
-						if (strcmp(sReceiveBuffer, "stop") == 0)
+						if (strcmp(sReceiveBuffer, "Stop") == 0)
+						{
+							send_string(NS, "Игра в города прервана.\n");
 							break;
+						}
 
 						char* find = _strupr(&sReceiveBuffer[nReaded - 1]);
 
 						printf("last letter: %s\n", find);
 
-						char sSendBuffer[1024]{};
 						bool cheсk = false;
+						char sSendBuffer[1024]{};
 
 						for (int i = 0; i < cityCounter; i++)
 							if (cityList[i][0] == *find)
@@ -213,13 +216,13 @@ int main()
 							}
 						if (!cheсk)
 						{
-							_snprintf(sSendBuffer, sizeof(sSendBuffer), "Города закончились. Вы выйграли!");
+							_snprintf(sSendBuffer, sizeof(sSendBuffer), "Города закончились. Вы выйграли!\nКонец игры.\r\n");
+							send_string(NS, sSendBuffer);
 							break;
 						}
 						_snprintf(sSendBuffer, sizeof(sSendBuffer), "%s\r\n", sSendBuffer);
 						send_string(NS, sSendBuffer);
 					} while (true);
-					send_string(NS, "Игра в города закончена.\n");
 				}
 			}
 			else
